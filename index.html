@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>FlashBuzzer - Dual Player Quiz Buzzer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Top Header & Controls -->
+    <header class="top-nav">
+      <div class="brand">
+        <div class="brand-icon">⚡</div>
+        <div class="brand-text">
+          <h1>FlashBuzzer</h1>
+          <span class="subtitle">Precision Dual Buzzer System</span>
+        </div>
+      </div>
+
+      <div class="nav-controls">
+        <div class="setting-item">
+          <label for="tieThreshold" title="Window within which both presses count as simultaneous">
+            Tie Window: <span id="thresholdValue">40ms</span>
+          </label>
+          <input type="range" id="tieThreshold" min="5" max="100" value="40" step="5">
+        </div>
+        <button id="soundToggleBtn" class="pill-btn" title="Toggle Sound">
+          <span class="btn-icon">🔊</span>
+          <span class="btn-label">Sound ON</span>
+        </button>
+        <button id="helpBtn" class="pill-btn" title="View Keybinds & Guide">
+          <span class="btn-icon">⌨️</span>
+          <span class="btn-label">Shortcuts</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Center Stage / Status Banner -->
+    <section class="status-stage" id="statusStage">
+      <div class="status-badge" id="statusBadge">READY</div>
+      <h2 class="status-message" id="statusMessage">Press Your Buzzer First to Answer!</h2>
+      <div class="status-subdetail" id="statusSubdetail">
+        Simultaneous press auto-resets &bull; Press <kbd>Space</kbd> to manual reset
+      </div>
+      
+      <!-- Quick Action Bar -->
+      <div class="action-bar">
+        <button id="manualResetBtn" class="action-btn reset-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+            <path d="M3 3v5h5"/>
+          </svg>
+          Reset Buzzer (Space)
+        </button>
+        <div class="score-quick">
+          <span id="quickScoreP1" class="p1-score-pill">P1: 0</span>
+          <span class="score-divider">:</span>
+          <span id="quickScoreP2" class="p2-score-pill">P2: 0</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Buzzer Arena (Two Buzzers) -->
+    <main class="buzzer-arena">
+      <!-- Player 1 Side -->
+      <div class="player-column player-1-side" id="p1Card">
+        <div class="player-header">
+          <div class="player-title-wrap">
+            <input type="text" class="player-name-input" id="p1Name" value="Player 1" maxlength="15" title="Click to edit name">
+            <span class="edit-hint">✎</span>
+          </div>
+          <div class="score-box">
+            <span class="score-label">SCORE</span>
+            <span class="score-number" id="p1Score">0</span>
+          </div>
+        </div>
+
+        <div class="buzzer-wrapper">
+          <button class="buzzer-btn p1-buzzer" id="p1BuzzerBtn" aria-label="Player 1 Buzzer">
+            <div class="buzzer-cap">
+              <span class="buzzer-icon">⚡</span>
+              <span class="buzzer-text">BUZZ</span>
+              <span class="buzzer-shortcut">Key [A]</span>
+            </div>
+            <div class="buzzer-ring"></div>
+            <div class="buzzer-base"></div>
+          </button>
+        </div>
+
+        <div class="player-footer">
+          <div class="timestamp-tag" id="p1Timestamp">--:--:--.---</div>
+          <div class="winner-trophy" id="p1WinnerBadge">FIRST TO ANSWER! 🏆</div>
+        </div>
+      </div>
+
+      <!-- Center Divider / VS -->
+      <div class="arena-divider">
+        <div class="divider-line"></div>
+        <div class="vs-circle" id="vsBadge">VS</div>
+        <div class="divider-line"></div>
+      </div>
+
+      <!-- Player 2 Side -->
+      <div class="player-column player-2-side" id="p2Card">
+        <div class="player-header">
+          <div class="player-title-wrap">
+            <input type="text" class="player-name-input" id="p2Name" value="Player 2" maxlength="15" title="Click to edit name">
+            <span class="edit-hint">✎</span>
+          </div>
+          <div class="score-box">
+            <span class="score-label">SCORE</span>
+            <span class="score-number" id="p2Score">0</span>
+          </div>
+        </div>
+
+        <div class="buzzer-wrapper">
+          <button class="buzzer-btn p2-buzzer" id="p2BuzzerBtn" aria-label="Player 2 Buzzer">
+            <div class="buzzer-cap">
+              <span class="buzzer-icon">🔥</span>
+              <span class="buzzer-text">BUZZ</span>
+              <span class="buzzer-shortcut">Key [L]</span>
+            </div>
+            <div class="buzzer-ring"></div>
+            <div class="buzzer-base"></div>
+          </button>
+        </div>
+
+        <div class="player-footer">
+          <div class="timestamp-tag" id="p2Timestamp">--:--:--.---</div>
+          <div class="winner-trophy" id="p2WinnerBadge">FIRST TO ANSWER! 🏆</div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Bottom History & Timestamp Log Panel -->
+    <section class="log-section">
+      <div class="log-header">
+        <div class="log-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+          <h3>Timestamped Event Log</h3>
+          <span class="log-count" id="logCount">0 events</span>
+        </div>
+        <div class="log-actions">
+          <button id="downloadLogBtn" class="secondary-btn" title="Download Log as CSV">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Export CSV
+          </button>
+          <button id="clearLogBtn" class="secondary-btn danger-hover" title="Clear all logged events">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"/>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+            </svg>
+            Clear Log
+          </button>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="event-table">
+          <thead>
+            <tr>
+              <th>Round #</th>
+              <th>Result / Winner</th>
+              <th>Exact Timestamp</th>
+              <th>Delta / Timing Gap</th>
+              <th>Outcome & Details</th>
+            </tr>
+          </thead>
+          <tbody id="logBody">
+            <tr class="empty-row" id="emptyRow">
+              <td colspan="5">No buzzer events yet. Press a buzzer button or keyboard key to begin!</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Keyboard Shortcuts Modal -->
+    <div class="modal-overlay" id="helpModal" hidden>
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3>🎮 Controls & Keyboard Shortcuts</h3>
+          <button class="close-modal-btn" id="closeModalBtn">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="keybind-grid">
+            <div class="keybind-card p1-keybind">
+              <div class="keybind-player">Player 1 (Left)</div>
+              <div class="key-badge"><kbd>A</kbd> or <kbd>Q</kbd></div>
+              <p>Triggers Player 1 buzzer instantly</p>
+            </div>
+            <div class="keybind-card p2-keybind">
+              <div class="keybind-player">Player 2 (Right)</div>
+              <div class="key-badge"><kbd>L</kbd> or <kbd>P</kbd></div>
+              <p>Triggers Player 2 buzzer instantly</p>
+            </div>
+            <div class="keybind-card sys-keybind">
+              <div class="keybind-player">Reset System</div>
+              <div class="key-badge"><kbd>Space</kbd> or <kbd>R</kbd></div>
+              <p>Clears lock-out and prepares next round</p>
+            </div>
+          </div>
+          <div class="modal-note">
+            <strong>Simultaneous Press Rule:</strong> If both buttons or keys are triggered within the specified window (current: <span id="modalThreshold">40ms</span>), the buzzer immediately notes the exact timestamp, sounds a tie clash, and resets automatically for fair play!
+          </div>
+          <button class="primary-modal-btn" id="gotItBtn">Got It, Let's Play!</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
